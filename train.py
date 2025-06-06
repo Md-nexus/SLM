@@ -1,4 +1,5 @@
 print("Running imports...\n")
+import os
 import sys
 import json
 import torch
@@ -11,7 +12,7 @@ from torch.optim import optimizer
 print("All imports completed\n")
 
 print("Preparing Environment...\n")
-#---CLEAR CAHE---#
+#---CLEAR CACHE---#
 import gc
 torch.cuda.empty_cache()
 gc.collect()
@@ -30,7 +31,7 @@ vocab_size = len(stoi)
 
 with open("data/encoded.txt", "r", encoding="utf-8") as f:
     data = list(map(int, f.read().split()))
-print("Goten files\n")
+print("Files loaded\n")
 
 print("Creating Batches...\n")
 def create_batches(data, seq_length, batch_size):
@@ -55,7 +56,7 @@ print("Created Batches\n")
 seq_length = 64
 batch_size = 32
 num_epochs = 20
-learning_rate = 0.0005
+learning_rate = 0.0001
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 #---DATA PREP---#
@@ -66,6 +67,18 @@ print(f"Total batches: {x_batches.shape[0]}")
 model = SLM(vocab_size, embed_size=128, hidden_size=256).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+#---LOAD WEIGHTS IF THEY EXIST---#
+weights_path = "model/slm_weight.pt"
+if os.path.exists(weights_path):
+    print("Loading existing weights for fine-tuning... (^.^)")
+    model.load_state_dict(torch.load(weights_path, map_location=device))
+    learning_rate = 0.00005
+    #--RE-INSTANTIATE optimizer--#
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+else:
+    print("No exisxting weights found (X_X).\n""Training from scratch (-_-)")
 
 print("Starting training...\n")
 #---TRAINING LOOP---#
@@ -87,6 +100,8 @@ for epoch in range(num_epochs):
     avg_loss = total_loss / x_batches.shape[0]
     print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}")
 print("Saving Model")
+
+
 #---SAVE TRAINED MODEL---#
 torch.save(model.state_dict(), "model/slm_weight.pt")
 print("Training complete.")
