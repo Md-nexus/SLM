@@ -48,7 +48,7 @@ def create_batches(data, seq_length, batch_size):
         x_batches.append(x[:, i:i+seq_length])
         y_batches.append(y[:, i:i+seq_length])
 
-    return torch.tensor(x_batches), torch.tensor(y_batches)
+    return torch.tensor(np.array(x_batches)), torch.tensor(np.array(y_batches))
 print("Created Batches\n")
 
 #---CONFIG---#
