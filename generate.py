@@ -2,7 +2,7 @@ import torch
 import json
 from model.slm import SLM
 
-with open("data/vocab", "r", encoding="utf-8") as f:
+with open("data/vocab.json", "r", encoding="utf-8") as f:
 	vocab = json.load(f)
 
 stoi = vocab["stoi"]
@@ -19,7 +19,7 @@ def local_encode(text):
 	return [stoi.get(c, 0) for c in text]
 
 def local_decode(indices):
-	return " ".join([itos.get(i, ' ') for i in indices])
+	return ''.join([itos.get(i, '') for i in indices])
 
 
 @torch.no_grad()
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         prompt = input("You: ").strip()
         if prompt.lower() in ["quit", "exit"]:
             break
-        full_prompt = f"Q: {prompt}\nA:"
+        full_prompt = f"\nQ: {prompt}\nA:"
         response = generate(full_prompt, max_new_tokens=100, temperature=0.7)
         print("\nBot:", response.split('A:')[-1].strip())
         print("-" * 50)
