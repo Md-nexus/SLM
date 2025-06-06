@@ -55,7 +55,7 @@ print("Created Batches\n")
 seq_length = 64
 batch_size = 32
 num_epochs = 20
-learning_rate = 0.003
+learning_rate = 0.0005
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 #---DATA PREP---#
