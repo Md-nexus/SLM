@@ -14,7 +14,6 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 slm = SLM(vocab_size, embed_size=128, hidden_size=256).to(device)
 slm.load_state_dict(torch.load("model/slm_weight.pt", map_location=device))
 slm.eval()
-
 def local_encode(text):
 	return [stoi.get(c, 0) for c in text]
 
@@ -23,7 +22,7 @@ def local_decode(indices):
 
 
 @torch.no_grad()
-def generate(seed_text, max_new_tokens=100, temperature=0.8, stop_token="==="):
+def generate(seed_text, max_new_tokens=200, temperature=0.7, stop_token="==="):
     input_ids = torch.tensor(local_encode(seed_text), dtype=torch.long).unsqueeze(0).to(device)
     hidden = None
 
@@ -47,6 +46,6 @@ if __name__ == "__main__":
         if prompt.lower() in ["quit", "exit"]:
             break
         full_prompt = f"\nQ: {prompt}\nA:"
-        response = generate(full_prompt, max_new_tokens=100, temperature=0.7)
+        response = generate(full_prompt, max_new_tokens=60, temperature=0.5)
         print("\nBot:", response.split('A:')[-1].strip())
         print("-" * 50)
